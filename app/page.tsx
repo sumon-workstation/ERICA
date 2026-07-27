@@ -1,11 +1,15 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Logo } from "@/components/logo";
 import { ArrowRight, Boxes, Bot, BriefcaseBusiness, Check, UsersRound, type LucideIcon } from "lucide-react";
 const modules: [string,string,LucideIcon][]=[["CRM","Turn relationships into revenue.",BriefcaseBusiness],["Operations","Purchasing, invoices and a clean ledger.",Boxes],["People","From onboarding through leave.",UsersRound],["Automation","Every module working as one.",Bot]];
 export default function Landing(){
  return <main>
   <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-6"><Logo/><div className="flex items-center gap-3"><Link href="/login" className="btn-secondary">Sign in</Link><Link href="/login?mode=signup" className="btn">Start free</Link></div></nav>
-  <section className="mx-auto grid min-h-[76vh] max-w-7xl items-center gap-14 px-6 py-14 lg:grid-cols-[1.1fr_.9fr]">
+  <div className="mx-auto flex max-w-7xl justify-center px-6 pt-8">
+   <Image src="/erica-logo.svg" alt="ERICA — everything for business" width={525} height={280} priority className="h-auto w-[260px] sm:w-[340px]"/>
+  </div>
+  <section className="mx-auto grid min-h-[68vh] max-w-7xl items-center gap-14 px-6 pb-14 pt-8 lg:grid-cols-[1.1fr_.9fr]">
    <div><div className="mb-6 inline-flex rounded-full bg-lime/50 px-4 py-2 text-xs font-bold uppercase tracking-widest">One company. One source of truth.</div>
     <h1 className="max-w-3xl text-6xl font-black leading-[.93] tracking-[-.055em] sm:text-7xl">Your business finally works like <span className="text-moss">one business.</span></h1>
     <p className="mt-7 max-w-xl text-lg leading-8 text-black/60">ERICA unifies customers, people, money, inventory and workflows—so growing teams move faster without stitching together five tools.</p>
