@@ -1,8 +1,34 @@
 # ERICA
 
-ERICA is a multi-tenant SaaS operating platform that connects CRM, finance, HR,
-inventory/assets, and cross-module automation around a single shared entity
-record and audit timeline.
+ERICA is a multi-tenant SaaS operating platform that connects CRM, ERP/finance,
+HR, inventory/assets, and cross-module automation around a single shared
+entity record and audit timeline — a single application covering the same
+ground as running Salesforce + Odoo + BambooHR + Zoho Inventory + n8n
+separately, without the integration tax between them.
+
+## Modules
+
+- **CRM** (Salesforce-scope): lead capture & scoring, contact/account 360°,
+  Kanban pipeline with weighted forecasting, quotes → sales order conversion,
+  case/ticket management with SLA tracking, campaigns with member tracking,
+  discount approval workflow, activity timeline.
+- **ERP** (Odoo-scope): invoicing, purchase orders, vendor bills with 3-way
+  match, sales orders/quotations, expense reports, budgets vs actuals,
+  recurring billing, P&L / AR / AP reporting.
+- **HR** (BambooHR-scope): employee directory, applicant tracking (job
+  postings → candidate pipeline → hire), leave & attendance, onboarding
+  checklists, performance reviews & goals, benefits enrollment, document
+  e-signature, headcount/turnover/tenure analytics.
+- **Inventory & Assets** (Zoho Inventory-scope): multi-warehouse stock,
+  weighted-average cost valuation, item variants, bundles/kits, serial &
+  batch tracking, low-stock alerts, asset register with depreciation.
+- **Automation** (n8n-scope): trigger → condition → action workflow builder,
+  a template gallery, inbound webhooks (public per-org endpoint), a
+  credential vault, manual test-runs, and a full execution log.
+
+Every module writes to the same `entities`/`activity_log` backbone, so a won
+deal, an approved expense, or an urgent case can all trigger real
+cross-module side effects (see Architecture below).
 
 ## Stack
 
@@ -42,11 +68,19 @@ organization membership for every read and mutation. The `entities` table is
 the canonical person/company record across leads, customers, employees, and
 vendors. `activity_log` is populated by database triggers across modules.
 
-The automation runner currently executes three real cross-module workflows:
+The automation runner currently executes five real cross-module workflows,
+each triggerable from its module, from the template gallery, or from an
+inbound webhook:
 
 - low stock → draft purchase order + email notification
 - deal won → convert entity to customer + draft invoice
 - leave approved → shared calendar block + email notification
+- expense approved → ledger entry posted + email notification
+- urgent case opened → support team notified
+
+Inbound webhooks (`/api/webhooks/inbound/[token]`) let any external system —
+Zapier, a form provider, another internal tool — fire these same workflows
+by posting JSON to a per-organization, per-workflow secret URL.
 
 ## Validation
 
