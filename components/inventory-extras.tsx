@@ -1,0 +1,35 @@
+"use client"; import {FormEvent,useState} from "react"; import {mutate,Modal,FormButton} from "@/components/ui-kit"; import {Badge} from "@/components/list-section";
+
+export function WarehouseActions(){
+ const[open,setOpen]=useState(false),[busy,setBusy]=useState(false);
+ async function save(e:FormEvent<HTMLFormElement>){e.preventDefault();setBusy(true);try{const f=Object.fromEntries(new FormData(e.currentTarget));await mutate("POST",{table:"warehouses",data:f});location.reload()}catch(x:any){alert(x.message);setBusy(false)}}
+ return <><button className="btn-secondary" onClick={()=>setOpen(true)}>New warehouse</button><Modal title="New warehouse" open={open} onClose={()=>setOpen(false)}><form onSubmit={save} className="space-y-3"><input className="input" name="name" placeholder="Warehouse name" required/><input className="input" name="location" placeholder="Location"/><FormButton busy={busy}>Save warehouse</FormButton></form></Modal></>
+}
+
+export function StockAction({items,warehouses}:{items:any[];warehouses:any[]}){
+ const[open,setOpen]=useState(false),[busy,setBusy]=useState(false);
+ async function save(e:FormEvent<HTMLFormElement>){e.preventDefault();setBusy(true);const f:any=Object.fromEntries(new FormData(e.currentTarget));if(!f.warehouse_id)delete f.warehouse_id;if(!f.unit_cost)delete f.unit_cost;const r=await fetch("/api/stock",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(f)});if(r.ok)location.reload();else{alert((await r.json()).error);setBusy(false)}}
+ return <><button className="btn-secondary" onClick={()=>setOpen(true)}>Stock in / out</button><Modal title="Stock movement" open={open} onClose={()=>setOpen(false)}><form onSubmit={save} className="space-y-3"><select className="input" name="item_id" required>{items.map(i=><option value={i.id} key={i.id}>{i.name}</option>)}</select><select className="input" name="warehouse_id"><option value="">No specific warehouse</option>{warehouses.map((w:any)=><option value={w.id} key={w.id}>{w.name}</option>)}</select><select className="input" name="direction"><option value="in">Stock in</option><option value="out">Stock out</option></select><input className="input" name="quantity" type="number" min="1" placeholder="Quantity" required/><input className="input" name="unit_cost" type="number" step="any" placeholder="Unit cost (stock in — updates weighted avg)"/><input className="input" name="reason" placeholder="Reason"/><FormButton busy={busy}>Record movement</FormButton></form></Modal></>
+}
+
+export function VariantActions({items}:{items:any[]}){
+ const[open,setOpen]=useState(false),[busy,setBusy]=useState(false);
+ async function save(e:FormEvent<HTMLFormElement>){e.preventDefault();setBusy(true);try{const f:any=Object.fromEntries(new FormData(e.currentTarget));await mutate("POST",{table:"item_variants",data:{...f,quantity:Number(f.quantity||0)}});location.reload()}catch(x:any){alert(x.message);setBusy(false)}}
+ return <><button className="btn-secondary" onClick={()=>setOpen(true)}>New variant</button><Modal title="New item variant" open={open} onClose={()=>setOpen(false)}><form onSubmit={save} className="space-y-3"><select className="input" name="item_id" required><option value="">Base item</option>{items.map(i=><option value={i.id} key={i.id}>{i.name}</option>)}</select><input className="input" name="name" placeholder="Variant name (e.g. Large / Blue)" required/><input className="input" name="sku_suffix" placeholder="SKU suffix" required/><input className="input" name="quantity" type="number" placeholder="Quantity"/><FormButton busy={busy}>Save variant</FormButton></form></Modal></>
+}
+export function BundleActions({items}:{items:any[]}){
+ const[open,setOpen]=useState(false),[busy,setBusy]=useState(false);
+ async function save(e:FormEvent<HTMLFormElement>){e.preventDefault();setBusy(true);try{const f:any=Object.fromEntries(new FormData(e.currentTarget));await mutate("POST",{table:"item_components",data:{...f,quantity:Number(f.quantity||1)}});location.reload()}catch(x:any){alert(x.message);setBusy(false)}}
+ return <><button className="btn-secondary" onClick={()=>setOpen(true)}>New bundle component</button><Modal title="Compose bundle / kit" open={open} onClose={()=>setOpen(false)}><form onSubmit={save} className="space-y-3"><select className="input" name="parent_item_id" required><option value="">Bundle / kit item</option>{items.map(i=><option value={i.id} key={i.id}>{i.name}</option>)}</select><select className="input" name="component_item_id" required><option value="">Component item</option>{items.map(i=><option value={i.id} key={i.id}>{i.name}</option>)}</select><input className="input" name="quantity" type="number" placeholder="Quantity per bundle" defaultValue={1}/><FormButton busy={busy}>Save component</FormButton></form></Modal></>
+}
+export function SerialActions({items,warehouses}:{items:any[];warehouses:any[]}){
+ const[open,setOpen]=useState(false),[busy,setBusy]=useState(false);
+ async function save(e:FormEvent<HTMLFormElement>){e.preventDefault();setBusy(true);try{const f:any=Object.fromEntries(new FormData(e.currentTarget));if(!f.warehouse_id)delete f.warehouse_id;await mutate("POST",{table:"item_serials",data:f});location.reload()}catch(x:any){alert(x.message);setBusy(false)}}
+ return <><button className="btn-secondary" onClick={()=>setOpen(true)}>Register serial / batch</button><Modal title="Register serial number" open={open} onClose={()=>setOpen(false)}><form onSubmit={save} className="space-y-3"><select className="input" name="item_id" required><option value="">Item</option>{items.map(i=><option value={i.id} key={i.id}>{i.name}</option>)}</select><input className="input" name="serial_number" placeholder="Serial / batch number" required/><select className="input" name="warehouse_id"><option value="">Warehouse</option>{warehouses.map((w:any)=><option value={w.id} key={w.id}>{w.name}</option>)}</select><FormButton busy={busy}>Save</FormButton></form></Modal></>
+}
+export function SerialRow({s}:{s:any}){
+ const[busy,setBusy]=useState(false);
+ async function mark(status:string){setBusy(true);await mutate("PATCH",{table:"item_serials",id:s.id,data:{status}});location.reload()}
+ const tone=s.status==="in_stock"?"good":s.status==="damaged"?"bad":"default";
+ return <div className="flex items-center justify-between py-2 text-sm"><div><b>{s.serial_number}</b><p className="text-xs text-black/40">{s.inventory_items?.name}</p></div><div className="flex items-center gap-2"><Badge tone={tone as any}>{s.status.replace("_"," ")}</Badge>{s.status==="in_stock"&&<button disabled={busy} onClick={()=>mark("sold")} className="text-xs font-bold text-moss">Sell</button>}</div></div>
+}

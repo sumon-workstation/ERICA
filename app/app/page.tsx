@@ -1,13 +1,16 @@
 import { getContext } from "@/lib/context"; import { PageHeader } from "@/components/page-header"; import { DemoButton } from "@/components/demo-button"; import { money } from "@/lib/utils";
-import { ArrowUpRight,Bot,Boxes,UsersRound,WalletCards, type LucideIcon } from "lucide-react";
-export default async function Dashboard(){const {db,member}=await getContext(),oid=member.org_id;
- const [{count:customers},{count:employees},{data:deals},{data:items},{data:activity}]=await Promise.all([
+import { ArrowUpRight,Bot,Boxes,UsersRound,WalletCards,LifeBuoy,FileText,Briefcase, type LucideIcon } from "lucide-react";
+export default async function Dashboard(){const {db,member}=await getContext(),oid=member.org_id,currency=(member.organizations as any)?.currency||"USD";
+ const [{count:customers},{count:employees},{data:deals},{data:items},{data:activity},{count:openCases},{count:openQuotes},{count:candidates}]=await Promise.all([
   db.from("entities").select("*",{count:"exact",head:true}).eq("org_id",oid).eq("is_customer",true),
   db.from("employees").select("*",{count:"exact",head:true}).eq("org_id",oid),
   db.from("deals").select("value,stage").eq("org_id",oid),db.from("inventory_items").select("quantity,reorder_point").eq("org_id",oid),
-  db.from("activity_log").select("id,summary,module,created_at").eq("org_id",oid).order("created_at",{ascending:false}).limit(6)]);
+  db.from("activity_log").select("id,summary,module,created_at").eq("org_id",oid).order("created_at",{ascending:false}).limit(6),
+  db.from("cases").select("*",{count:"exact",head:true}).eq("org_id",oid).in("status",["open","pending"]),
+  db.from("quotes").select("*",{count:"exact",head:true}).eq("org_id",oid).eq("status","sent"),
+  db.from("candidates").select("*",{count:"exact",head:true}).eq("org_id",oid).not("stage","in","(hired,rejected)")]);
  const pipeline=deals?.filter(x=>!["Won","Lost"].includes(x.stage)).reduce((s,x)=>s+Number(x.value),0)||0,low=items?.filter(x=>x.quantity<=x.reorder_point).length||0;
- const cards: [string,string|number,LucideIcon][]=[["Pipeline",money(pipeline),WalletCards],["Customers",customers||0,ArrowUpRight],["Team",employees||0,UsersRound],["Low stock",low,Boxes]];
+ const cards: [string,string|number,LucideIcon][]=[["Pipeline",money(pipeline,currency),WalletCards],["Customers",customers||0,ArrowUpRight],["Team",employees||0,UsersRound],["Low stock",low,Boxes],["Open cases",openCases||0,LifeBuoy],["Quotes out",openQuotes||0,FileText],["In hiring pipeline",candidates||0,Briefcase]];
  return <><PageHeader eyebrow={(member.organizations as any)?.name||"Workspace"} title="Good morning. Here’s the pulse."><DemoButton/></PageHeader>
  <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{cards.map(([n,v,I])=><div className="card" key={n as string}><I className="text-moss" size={20}/><p className="mt-8 text-sm text-black/50">{n as string}</p><p className="mt-1 text-3xl font-black">{v as any}</p></div>)}</div>
  <div className="mt-6 grid gap-6 lg:grid-cols-[1.4fr_.6fr]"><section className="card"><div className="flex items-center justify-between"><h2 className="text-xl font-black">One business timeline</h2><span className="text-xs text-black/40">All modules</span></div><div className="mt-5 divide-y">{activity?.length?activity.map(a=><div className="flex items-center gap-3 py-3" key={a.id}><span className="grid h-9 w-9 place-items-center rounded-xl bg-lime/40"><Bot size={16}/></span><div><p className="text-sm font-semibold">{a.summary}</p><p className="text-xs capitalize text-black/40">{a.module} · {new Date(a.created_at).toLocaleString()}</p></div></div>):<p className="py-10 text-center text-sm text-black/40">Load demo data to see ERICA come alive.</p>}</div></section>
