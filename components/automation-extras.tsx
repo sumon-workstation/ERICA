@@ -31,8 +31,8 @@ export function CredentialActions(){
  async function save(e:FormEvent<HTMLFormElement>){e.preventDefault();setBusy(true);try{const f=Object.fromEntries(new FormData(e.currentTarget));await mutate("POST",{table:"automation_credentials",data:f});location.reload()}catch(x:any){alert(x.message);setBusy(false)}}
  return <><button className="btn-secondary" onClick={()=>setOpen(true)}>New credential</button><Modal title="Store a credential" open={open} onClose={()=>setOpen(false)}><form onSubmit={save} className="space-y-3"><input className="input" name="name" placeholder="Credential name (e.g. Slack workspace)" required/><select className="input" name="kind"><option value="api_key">API key</option><option value="oauth_token">OAuth token</option><option value="basic_auth">Basic auth</option></select><input className="input" name="value" type="password" placeholder="Secret value" required/><p className="text-xs text-black/40">Stored per-organization and only visible to org members with access to this workspace.</p><FormButton busy={busy}>Save credential</FormButton></form></Modal></>
 }
-export function CredentialRow({c}:{c:any}){
- return <div className="flex items-center justify-between py-3 text-sm"><div><b>{c.name}</b><p className="text-xs capitalize text-black/40">{c.kind.replace("_"," ")} · ••••{String(c.value).slice(-4)}</p></div><DeleteButton table="automation_credentials" id={c.id}/></div>
+export function CredentialRow({c}:{c:{id:string;name:string;kind:string;masked:string}}){
+ return <div className="flex items-center justify-between py-3 text-sm"><div><b>{c.name}</b><p className="text-xs capitalize text-black/40">{c.kind.replace("_"," ")} · {c.masked}</p></div><DeleteButton table="automation_credentials" id={c.id}/></div>
 }
 
 export function TestRunButton({ruleId}:{ruleId:string}){
