@@ -53,6 +53,19 @@ The first authenticated visit creates an organization and a 30-day trial.
 
 Set every variable from `.env.example` in Vercel. Never commit secrets. Apply
 the migrations in `supabase/migrations` to the production Supabase project.
+
+To automate the whole thing (schema push, Vercel env var sync, prod deploy)
+from a machine that has real network access to supabase.com and vercel.com,
+export the credentials listed at the top of `scripts/deploy.sh` and run it:
+
+```bash
+./scripts/deploy.sh
+```
+
+Two steps stay manual because they need a browser: attaching your custom
+domain in Vercel (Domains tab) and pointing its DNS, and creating the Stripe
+webhook below.
+
 Create a Stripe webhook pointing to:
 
 `https://YOUR_DOMAIN/api/webhooks/stripe`
