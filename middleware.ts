@@ -6,7 +6,7 @@ export async function middleware(req:NextRequest){
     cookies:{getAll:()=>req.cookies.getAll(),setAll(items:{name:string;value:string;options?:any}[]){items.forEach(i=>req.cookies.set(i.name,i.value));res=NextResponse.next({request:req});items.forEach(i=>res.cookies.set(i.name,i.value,i.options))}}
   });
   const {data:{user}}=await supabase.auth.getUser();
-  if(!user&&req.nextUrl.pathname.startsWith("/app")) return NextResponse.redirect(new URL("/login",req.url));
+  if(!user&&req.nextUrl.pathname.startsWith("/app")) return NextResponse.redirect(new URL("/demo",req.url));
   if(user&&req.nextUrl.pathname==="/login") return NextResponse.redirect(new URL("/app",req.url));
   return res;
 }
