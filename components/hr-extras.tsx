@@ -10,12 +10,12 @@ export function CandidateActions({jobPostings}:{jobPostings:any[]}){
  async function save(e:FormEvent<HTMLFormElement>){e.preventDefault();setBusy(true);try{const f=Object.fromEntries(new FormData(e.currentTarget));await mutate("POST",{table:"candidates",data:f});location.reload()}catch(x:any){alert(x.message);setBusy(false)}}
  return <><button className="btn" onClick={()=>setOpen(true)}>Add candidate</button><Modal title="Add candidate" open={open} onClose={()=>setOpen(false)}><form onSubmit={save} className="space-y-3"><select className="input" name="job_posting_id" required><option value="">Job posting</option>{jobPostings.map((j:any)=><option value={j.id} key={j.id}>{j.title}</option>)}</select><input className="input" name="name" placeholder="Candidate name" required/><input className="input" name="email" type="email" placeholder="Email"/><input className="input" name="phone" placeholder="Phone"/><FormButton busy={busy}>Save candidate</FormButton></form></Modal></>
 }
-const stages=["applied","screening","interview","offer","hired","rejected"];
+const selectableStages=["applied","screening","interview","offer","rejected"];
 export function CandidateRow({c}:{c:any}){
  const[busy,setBusy]=useState(false);
  async function setStage(stage:string){setBusy(true);await mutate("PATCH",{table:"candidates",id:c.id,data:{stage}});location.reload()}
  async function hire(){setBusy(true);const r=await fetch("/api/candidates/hire",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({candidate_id:c.id})});if(r.ok)location.reload();else{alert((await r.json()).error);setBusy(false)}}
- return <div className="flex items-center justify-between gap-2 py-3 text-sm"><div><b>{c.name}</b><p className="text-xs text-black/40">{c.job_postings?.title}</p></div>{c.stage==="hired"?<Badge tone="good">Hired</Badge>:<div className="flex items-center gap-2"><select disabled={busy} className="rounded-lg border p-1 text-xs" value={c.stage} onChange={e=>setStage(e.target.value)}>{stages.map(s=><option key={s}>{s}</option>)}</select>{c.stage==="offer"&&<button disabled={busy} onClick={hire} className="text-xs font-bold text-moss">Hire</button>}</div>}</div>
+ return <div className="flex items-center justify-between gap-2 py-3 text-sm"><div><b>{c.name}</b><p className="text-xs text-black/40">{c.job_postings?.title}</p></div>{c.stage==="hired"?<Badge tone="good">Hired</Badge>:<div className="flex items-center gap-2"><select disabled={busy} className="rounded-lg border p-1 text-xs" value={c.stage} onChange={e=>setStage(e.target.value)}>{selectableStages.map(s=><option key={s}>{s}</option>)}</select>{c.stage==="offer"&&<button disabled={busy} onClick={hire} className="text-xs font-bold text-moss">Hire</button>}</div>}</div>
 }
 
 export function ReviewActions({employees}:{employees:any[]}){
