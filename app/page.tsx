@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Logo } from "@/components/logo";
-import { ArrowRight, Boxes, Bot, BriefcaseBusiness, Check, UsersRound } from "lucide-react";
-const modules=[["CRM","Turn relationships into revenue.",BriefcaseBusiness],["Operations","Purchasing, invoices and a clean ledger.",Boxes],["People","From onboarding through leave.",UsersRound],["Automation","Every module working as one.",Bot]];
+import { ArrowRight, Boxes, Bot, BriefcaseBusiness, Check, UsersRound, type LucideIcon } from "lucide-react";
+const modules: [string,string,LucideIcon][]=[["CRM","Turn relationships into revenue.",BriefcaseBusiness],["Operations","Purchasing, invoices and a clean ledger.",Boxes],["People","From onboarding through leave.",UsersRound],["Automation","Every module working as one.",Bot]];
 export default function Landing(){
  return <main>
   <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-6"><Logo/><div className="flex items-center gap-3"><Link href="/login" className="btn-secondary">Sign in</Link><Link href="/login?mode=signup" className="btn">Start free</Link></div></nav>
