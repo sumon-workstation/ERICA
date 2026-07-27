@@ -1,0 +1,1 @@
+export function PageHeader({eyebrow,title,children}:{eyebrow:string,title:string,children?:React.ReactNode}){return <header className="mb-8 flex flex-wrap items-end justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[.2em] text-moss">{eyebrow}</p><h1 className="mt-2 text-4xl font-black tracking-tight">{title}</h1></div>{children}</header>}

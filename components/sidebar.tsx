@@ -1,0 +1,6 @@
+"use client";
+import Link from "next/link"; import { usePathname } from "next/navigation";
+import { LayoutDashboard,BriefcaseBusiness,Bot,Boxes,UsersRound,ReceiptText,CreditCard,LogOut } from "lucide-react";
+import { Logo } from "./logo"; import { createClient } from "@/lib/supabase/client"; import { cn } from "@/lib/utils";
+const links=[["Overview","/app",LayoutDashboard],["CRM","/app/crm",BriefcaseBusiness],["Automation","/app/automation",Bot],["Inventory","/app/inventory",Boxes],["People","/app/hr",UsersRound],["Finance","/app/erp",ReceiptText],["Billing","/app/billing",CreditCard]];
+export function Sidebar(){const p=usePathname();return <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col bg-ink p-4 text-white md:flex"><div className="px-3 py-3"><Logo light/></div><nav className="mt-8 flex-1 space-y-1">{links.map(([n,h,I])=><Link key={h as string} href={h as string} className={cn("flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-white/55 hover:bg-white/5 hover:text-white",p===h&&"bg-white/10 text-white")}><I size={18}/>{n as string}</Link>)}</nav><button onClick={async()=>{await createClient().auth.signOut();location.href="/"}} className="flex items-center gap-3 px-3 py-3 text-sm text-white/50"><LogOut size={17}/> Sign out</button></aside>}

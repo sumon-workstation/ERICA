@@ -1,0 +1,1 @@
+export function Logo({light=false}:{light?:boolean}){return <div className={`flex items-center gap-2 font-black tracking-tight ${light?"text-white":""}`}><span className="grid h-8 w-8 place-items-center rounded-xl bg-lime text-ink">E</span><span>ERICA</span></div>}
