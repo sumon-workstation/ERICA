@@ -1,0 +1,14 @@
+inputSet:
+  name: Build_sumon_workstation_ERICA_1788298377343-pr-trigger-input-set
+  identifier: Build_sumon_workstation_ERICA_1788298377343prtriggerinputset
+  orgIdentifier: default
+  projectIdentifier: default_project
+  pipeline:
+    identifier: Build_sumon_workstation_ERICA_1788298377343
+    properties:
+      ci:
+        codebase:
+          build:
+            type: PR
+            spec:
+              number: <+trigger.prNumber>
