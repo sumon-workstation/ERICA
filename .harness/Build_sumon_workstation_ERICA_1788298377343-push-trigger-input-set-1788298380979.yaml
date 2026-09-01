@@ -1,0 +1,14 @@
+inputSet:
+  name: Build_sumon_workstation_ERICA_1788298377343-push-trigger-input-set
+  identifier: Build_sumon_workstation_ERICA_1788298377343pushtriggerinputset
+  orgIdentifier: default
+  projectIdentifier: default_project
+  pipeline:
+    identifier: Build_sumon_workstation_ERICA_1788298377343
+    properties:
+      ci:
+        codebase:
+          build:
+            type: branch
+            spec:
+              branch: <+trigger.branch>
